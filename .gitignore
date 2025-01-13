@@ -1,0 +1,8 @@
+# Node.js deoendencies
+node_modules/
+
+# Environment Variable Files
+.env
+
+# IDE/editor folders
+.vscode/
