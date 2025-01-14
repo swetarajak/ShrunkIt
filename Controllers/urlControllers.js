@@ -126,4 +126,51 @@ export const qrGenerator = async (req, res) => {
 //         res.status(500).json({ error: 'Failed to fetch QR Code' });
 //     }
     
-// }
+// }import shortid from 'shortid';
+export const shortenedCustomUrl = async (req, res) => {
+    const { originalUrl, customCode } = req.body;
+
+    // Validate the original URL
+    if (!originalUrl) {
+        return res.status(400).json({ error: 'Original URL is required.' });
+    }
+
+    const isValidUrl = (url) => {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    };
+
+    if (!isValidUrl(originalUrl)) {
+        return res.status(400).json({ error: 'Invalid URL format.' });
+    }
+
+    try {
+        // Generate a short code if no custom code is provided
+        const shortenUrl = customCode || shortid.generate();
+
+        // Check if the custom code already exists
+        if (customCode) {
+            const existingUrl = await Url.findOne({ shortenUrl: customCode });
+            if (existingUrl) {
+                return res.status(400).json({ error: 'Custom code already exists. Please choose another.' });
+            }
+        }
+
+        // Save the URL and short code to the database
+        const newUrl = new Url({
+            originalUrl,
+            shortenUrl
+        });
+
+        await newUrl.save();
+
+        res.json({ shortUrl: `http://localhost:8000/api/${shortenUrl}` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error.' });
+    }
+};
