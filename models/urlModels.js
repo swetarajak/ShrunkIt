@@ -5,17 +5,26 @@ const urlSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  shortenUrl: {
+  shortUrl: {
     type: String,
-    // required: true,
     unique: true,
   },
-  qrCode: {
-    type: Buffer,
-    // required: true,
+  customUrl :{
+    type: String,
     unique: true
   },
-});
+  qrCode: {
+   type:String
+  },
+  analytics: {
+    visits: {
+      type: Number,
+      default: 0
+    },
+    referrers:[{ type: String }]
+  },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+}, { timestamps: true });
 
 const Url = mongoose.model("Url", urlSchema);
 
